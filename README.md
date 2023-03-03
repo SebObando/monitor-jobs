@@ -17,14 +17,14 @@ curl http://0.0.0.0:80/execute_handle_warning_state/<build_id>
 curl \
   -X POST \
   -H "Content-Type: application/json" \
-  -d '{"organization": <organization>,
-       "project": "<project>",
-       "stage_ref_name": "<stage_ref_name>",
-       "run_ids": "<run_ids>",
-       "build_id": "<build_id>",
-       "ado_token": "<ado_token>",
-       "databricks_base_uri": "<databricks_base_uri>",
-       "databricks_token": "<databricks_token">"
-       }
+  -d '{"organization": <organization>, \
+       "project": "<project>", \
+       "stage_ref_name": "<stage_ref_name>", \
+       "run_ids": "<run_ids>", \
+       "build_id": "<build_id>", \
+       "ado_token": "<ado_token>", \
+       "databricks_base_uri": "<databricks_base_uri>", \
+       "databricks_token": "<databricks_token">" \
+       } \
    http://0.0.0.0:80/execute_monitor_jobs          
 ```
