@@ -1,4 +1,4 @@
-# The monitor jobs module contains all to monitor Databricks jobs with ADO
+# The monitor jobs module contains all to monitor Dnd_pointatabricks jobs with ADO
 # Documentacion link: https://inspirato.atlassian.net/l/cp/Bh2QiC0A
 
 import logging
@@ -11,8 +11,10 @@ from fastapi import FastAPI
 
 
 # ------------------ API ------------------#
-app = FastAPI()
-logger = logging.getLogger(__name__)
+app = FastAPI(debug=True)
+
+FORMAT = "%(levelname)s:%(message)s"
+logging.basicConfig(format=FORMAT, level=logging.DEBUG)
 
 @app.get("/execute_handle_warning_state/{build_id}")
 async def execute_handle_warning_state(build_id):
@@ -32,14 +34,14 @@ async def execute_monitor_jobs(req_body: dict):
     databricks_base_uri = req_body.get('databricks_base_uri')
     databricks_token = req_body.get('databricks_token')
 
-    logger.info("build_ids " + build_id)
-    logger.info("run_ids: " + run_ids)
-    logger.info("project: " + project)
-    logger.info("organization: " + organization)
-    logger.info("stage_ref_name: " + stage_ref_name)
-    logger.info("ado_token: " + ado_token)
-    logger.info("databricks_base_uri: " + databricks_base_uri)
-    logger.info("databricks_token : " + databricks_token)
+    logging.info("build_ids " + build_id)
+    logging.info("run_ids: " + run_ids)
+    logging.info("project: " + project)
+    logging.info("organization: " + organization)
+    logging.info("stage_ref_name: " + stage_ref_name)
+    logging.info("ado_token: " + ado_token)
+    logging.info("databricks_base_uri: " + databricks_base_uri)
+    logging.info("databricks_token : " + databricks_token)
 
     translate_states = {
         "RUNNING": "",
@@ -54,7 +56,7 @@ async def execute_monitor_jobs(req_body: dict):
         f"stages/{stage_ref_name}?api-version=7.0"
     )
     is_build_state = validate_build_state(path_to_file)
-    logger.info(f"is_build_state: {is_build_state}")
+    logging.info(f"is_build_state: {is_build_state}")
     if is_build_state:
         run_state = wait_runs_completion(
             run_ids, databricks_base_uri, databricks_token
@@ -111,7 +113,7 @@ def validate_build_state(path_to_file: str) -> bool:
     state = read_build_state(path_to_file)
     if state == "WARNING":
         validation = True
-    logger.info("Validate build state: " + str(validation))
+    logging.info("Validate build state: " + str(validation))
     return validation
 
 
@@ -168,7 +170,7 @@ def get_runs_status_report(runs_status_info: Dict[Any, Any]) -> Dict[str, int]:
                 + " ,RUN ID "
                 + str(run_id)
             )
-            logger.info(log_message)
+            logging.info(log_message)
     return runs_status_report
 
 
@@ -181,7 +183,7 @@ def validate_runs_state(runs_status_report: Dict[Any, int]) -> str:
         run_state = "TERMINATED"
     else:
         run_state = "SKIPPED"
-    logger.info("Validation state: " + run_state)
+    logging.info("Validation state: " + run_state)
     return run_state
 
 
@@ -196,13 +198,13 @@ def monitor_runs(
         runs_status_info = get_runs_status_info(
             databricks_base_uri, databricks_token, run_ids
         )
-        logger.info(f"runs_status_info: {str(runs_status_info)}")
+        logging.info(f"runs_status_info: {str(runs_status_info)}")
         runs_status_report = get_runs_status_report(runs_status_info)
-        logger.info(f"runs_status_report: {str(runs_status_report)}")
+        logging.info(f"runs_status_report: {str(runs_status_report)}")
         state = validate_runs_state(runs_status_report)
     else:
         state = "SUCCESS"
-        logger.info("There are not jobs to monitor")
+        logging.info("There are not jobs to monitor")
     return state
 
 
@@ -238,11 +240,11 @@ def update_monitor_stage_state(
     }
     payload = {"forceRetryAllJobs": True, "state": state}
     response = requests.patch(end_point, headers=head, json=payload)
-    logger.info(
+    logging.info(
         "Update monitor stage state status code: " + str(response.status_code)
     )
     status_code = response.status_code
-    logger.info("Update monitor stage state status code: " + str(status_code))
+    logging.info("Update monitor stage state status code: " + str(status_code))
     return status_code
 
 
